@@ -1,0 +1,5 @@
+build/
+dist/
+*.plist
+!Resources/Info.plist
+.DS_Store
