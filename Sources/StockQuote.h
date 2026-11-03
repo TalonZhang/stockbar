@@ -11,6 +11,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic) double percentChange;
 @property (nonatomic, getter=isAvailable) BOOL available;
 @property (nonatomic, strong) NSDate *updatedAt;
+@property (nonatomic, copy, readonly) NSString *formattedPrice;
 
 - (instancetype)initWithName:(NSString *)name
                          code:(NSString *)code

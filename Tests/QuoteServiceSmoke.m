@@ -23,7 +23,8 @@ int main(int argc, const char *argv[]) {
             return 1;
         }
 
-        NSArray<NSString *> *codes = @[@"600519", @"000001", @"300750", @"920002"];
+        NSArray<NSString *> *codes = @[@"600519", @"000001", @"300750", @"920002",
+                                      @"512890", @"510310", @"159915", @"161725"];
         TencentQuoteService *service = [[TencentQuoteService alloc] initWithCodes:codes];
         NSString *sourceArgument = argc > 1 ? [NSString stringWithUTF8String:argv[1]] : @"auto";
         if ([sourceArgument isEqualToString:@"tencent"]) {
@@ -42,10 +43,10 @@ int main(int argc, const char *argv[]) {
             for (StockQuote *quote in quotes) {
                 if (quote.isAvailable) {
                     availableCount++;
-                    printf("%s %s %.2f %+.2f%%\n",
+                    printf("%s %s %s %+.2f%%\n",
                            quote.code.UTF8String,
                            quote.name.UTF8String,
-                           quote.price,
+                           quote.formattedPrice.UTF8String,
                            quote.percentChange);
                 }
             }
@@ -68,6 +69,27 @@ int main(int argc, const char *argv[]) {
         if (!succeeded) {
             fprintf(stderr, "quote smoke test returned incomplete data\n");
             return 3;
+        }
+
+        // Exercise the same validation endpoint used by the inline add field.
+        __block NSUInteger validatedCount = 0;
+        __block BOOL validationOK = YES;
+        for (NSString *code in @[@"512890", @"510310"]) {
+            [service validateCode:code completion:^(StockQuote *quote, NSError *error) {
+                BOOL valid = !error && quote.isAvailable && [quote.code isEqualToString:code]
+                    && [quote.name containsString:@"ETF"] && quote.price > 0.0;
+                validationOK &= valid;
+                validatedCount++;
+                printf("add validation %s: %s\n", code.UTF8String, valid ? "OK" : "FAILED");
+            }];
+        }
+        NSDate *validationDeadline = [NSDate dateWithTimeIntervalSinceNow:15.0];
+        while (validatedCount < 2 && [validationDeadline timeIntervalSinceNow] > 0.0) {
+            [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode
+                                     beforeDate:[NSDate dateWithTimeIntervalSinceNow:0.1]];
+        }
+        if (!validationOK || validatedCount != 2) {
+            return 4;
         }
         return 0;
     }

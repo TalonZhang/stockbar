@@ -84,7 +84,7 @@ static const CGFloat StockRowHeight = 28.0;
 - (void)updateWithQuote:(StockQuote *)quote {
     self.stockCode = quote.code;
     self.nameLabel.stringValue = quote.name.length > 0 ? quote.name : quote.code;
-    self.toolTip = quote.code;
+    self.toolTip = [NSString stringWithFormat:@"%@ · %@", quote.name, quote.code];
 
     if (!quote.isAvailable) {
         self.percentLabel.stringValue = @"--";
@@ -96,7 +96,7 @@ static const CGFloat StockRowHeight = 28.0;
     }
 
     self.percentLabel.stringValue = [NSString stringWithFormat:@"%+.2f%%", quote.percentChange];
-    self.priceLabel.stringValue = [NSString stringWithFormat:@"¥%.2f", quote.price];
+    self.priceLabel.stringValue = [@"¥" stringByAppendingString:quote.formattedPrice];
 
     NSColor *movementColor;
     if (fabs(quote.percentChange) < 0.0001) {
@@ -107,11 +107,11 @@ static const CGFloat StockRowHeight = 28.0;
     self.percentLabel.textColor = movementColor;
     self.priceLabel.textColor = movementColor;
     NSString *direction = quote.percentChange > 0.0 ? @"上涨" : (quote.percentChange < 0.0 ? @"下跌" : @"平盘");
-    self.accessibilityLabel = [NSString stringWithFormat:@"%@，%@ %.2f%%，现价 %.2f元",
+    self.accessibilityLabel = [NSString stringWithFormat:@"%@，%@ %.2f%%，现价 %@元",
                                self.nameLabel.stringValue,
                                direction,
                                fabs(quote.percentChange),
-                               quote.price];
+                               quote.formattedPrice];
 }
 
 - (void)setDraggable:(BOOL)draggable {

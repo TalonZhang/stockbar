@@ -1,6 +1,16 @@
 #import "StockQuote.h"
+#import "WatchlistStore.h"
 
 @implementation StockQuote
+
+- (NSString *)formattedPrice {
+    if (!self.isAvailable) {
+        return @"--";
+    }
+    return [WatchlistStore isExchangeTradedFundCode:self.code]
+        ? [NSString stringWithFormat:@"%.3f", self.price]
+        : [NSString stringWithFormat:@"%.2f", self.price];
+}
 
 - (instancetype)initWithName:(NSString *)name
                          code:(NSString *)code

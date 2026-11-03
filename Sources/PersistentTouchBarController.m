@@ -330,7 +330,7 @@ typedef void (*PresentTouchBarSimpleFn)(id receiver, SEL selector, NSTouchBar *t
     }
 
     NSString *value = self.showsPrices
-        ? [NSString stringWithFormat:@"¥%.2f", quote.price]
+        ? [@"¥" stringByAppendingString:quote.formattedPrice]
         : [NSString stringWithFormat:@"%+.2f%%", quote.percentChange];
     NSString *title = [NSString stringWithFormat:@"%@ %@", quote.name, value];
 
@@ -353,7 +353,7 @@ typedef void (*PresentTouchBarSimpleFn)(id receiver, SEL selector, NSTouchBar *t
         NSFontAttributeName: font
     }];
     NSString *direction = quote.percentChange > 0.0 ? @"上涨" : (quote.percentChange < 0.0 ? @"下跌" : @"平盘");
-    button.accessibilityTitle = [NSString stringWithFormat:@"%@，%@ %.2f%%，现价 %.2f", quote.name, direction, fabs(quote.percentChange), quote.price];
+    button.accessibilityTitle = [NSString stringWithFormat:@"%@，%@ %.2f%%，现价 %@", quote.name, direction, fabs(quote.percentChange), quote.formattedPrice];
 }
 
 @end

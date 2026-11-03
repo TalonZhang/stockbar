@@ -135,7 +135,7 @@ typedef void (^SourceCompletion)(NSDictionary<NSString *, StockQuote *> *quotes,
         if (!quote && !error) {
             error = [NSError errorWithDomain:QuoteServiceErrorDomain
                                         code:2
-                                    userInfo:@{NSLocalizedDescriptionKey: @"未找到该股票代码"}];
+                                    userInfo:@{NSLocalizedDescriptionKey: @"未找到该股票或场内基金代码"}];
         }
         completion(quote, error);
     }];
@@ -190,7 +190,7 @@ typedef void (^SourceCompletion)(NSDictionary<NSString *, StockQuote *> *quotes,
     if (symbols.count == 0) {
         NSError *error = [NSError errorWithDomain:QuoteServiceErrorDomain
                                              code:1
-                                         userInfo:@{NSLocalizedDescriptionKey: @"没有有效的股票代码"}];
+                                         userInfo:@{NSLocalizedDescriptionKey: @"没有有效的股票或场内基金代码"}];
         completion(@{}, error);
         return;
     }
@@ -221,15 +221,17 @@ typedef void (^SourceCompletion)(NSDictionary<NSString *, StockQuote *> *quotes,
     NSMutableArray<NSString *> *securityIDs = [NSMutableArray arrayWithCapacity:codes.count];
     NSMutableDictionary<NSString *, NSString *> *codesBySecurityID = [NSMutableDictionary dictionaryWithCapacity:codes.count];
     for (NSString *code in codes) {
-        NSString *normalized = [code isEqualToString:QuoteCodeSSECompositeIndex]
+        BOOL isIndex = [code isEqualToString:QuoteCodeSSECompositeIndex];
+        NSString *normalized = isIndex
             ? @"000001"
             : [WatchlistStore normalizedCodeFromInput:code];
         if (!normalized) {
             continue;
         }
-        NSString *market = [code isEqualToString:QuoteCodeSSECompositeIndex]
+        NSString *symbol = isIndex ? @"sh000001" : [WatchlistStore marketSymbolForCode:normalized];
+        NSString *market = [symbol hasPrefix:@"sh"]
             ? @"1"
-            : ([normalized hasPrefix:@"6"] ? @"1" : @"0");
+            : @"0";
         NSString *securityID = [NSString stringWithFormat:@"%@.%@", market, normalized];
         [securityIDs addObject:securityID];
         codesBySecurityID[securityID] = code;
@@ -237,7 +239,7 @@ typedef void (^SourceCompletion)(NSDictionary<NSString *, StockQuote *> *quotes,
     if (securityIDs.count == 0) {
         completion(@{}, [NSError errorWithDomain:QuoteServiceErrorDomain
                                              code:1
-                                         userInfo:@{NSLocalizedDescriptionKey: @"没有有效的股票代码"}]);
+                                         userInfo:@{NSLocalizedDescriptionKey: @"没有有效的股票或场内基金代码"}]);
         return;
     }
 

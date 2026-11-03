@@ -7,6 +7,8 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol AddStockMenuItemViewDelegate <NSObject>
 
 - (void)addStockMenuItemView:(AddStockMenuItemView *)view didSubmitInput:(NSString *)input;
+@optional
+- (void)addStockMenuItemViewDidRequestEditing:(AddStockMenuItemView *)view;
 
 @end
 

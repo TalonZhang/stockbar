@@ -3,3 +3,13 @@ dist/
 *.plist
 !Resources/Info.plist
 .DS_Store
+.env
+.env.*
+!.env.example
+.aws/
+*.p8
+*.p12
+*.pem
+*.key
+id_rsa
+id_ed25519
