@@ -1,7 +1,7 @@
 PRODUCT_NAME := StockBar
 EXECUTABLE_NAME := StockBar
-VERSION := 0.7.1
-BUILD_NUMBER := 19
+VERSION := 0.7.2
+BUILD_NUMBER := 20
 BUILD_DIR := build
 DIST_DIR := dist
 APP_BUNDLE := $(BUILD_DIR)/StockBar.app
@@ -13,6 +13,9 @@ ARCH_DIR := $(BUILD_DIR)/arch
 X86_64_EXECUTABLE := $(ARCH_DIR)/$(EXECUTABLE_NAME)-x86_64
 ARM64_EXECUTABLE := $(ARCH_DIR)/$(EXECUTABLE_NAME)-arm64
 ICON := Resources/AppIcon.icns
+ICON_ARTWORK := Resources/AppIcon-artwork.png
+ICON_TOOL := $(BUILD_DIR)/MakeICNS
+ICONSET := $(BUILD_DIR)/AppIcon.iconset
 SOURCES := $(wildcard Sources/*.m)
 HEADERS := $(wildcard Sources/*.h)
 DMG_ROOT := $(BUILD_DIR)/dmg-root
@@ -36,11 +39,19 @@ SEARCH_TEST := $(BUILD_DIR)/StockSearchTest
 SEARCH_SMOKE := $(BUILD_DIR)/StockSearchSmoke
 SEARCH_PANEL_TEST := $(BUILD_DIR)/StockSearchPanelTest
 
-.PHONY: all app run test ui-test smoke-test search-smoke dmg release clean
+.PHONY: all app icon run test ui-test smoke-test search-smoke dmg release clean
 
 all: app
 
 app: $(EXECUTABLE)
+
+$(ICON_TOOL): Tools/MakeICNS.m
+	@mkdir -p "$(BUILD_DIR)"
+	$(CC) -fobjc-arc -Wall -Wextra Tools/MakeICNS.m -framework AppKit -framework Foundation -o "$@"
+
+icon: $(ICON_TOOL) $(ICON_ARTWORK)
+	"$(ICON_TOOL)" "$(ICON_ARTWORK)" "$(ICONSET)" "$(ICON)"
+	cp "$(ICONSET)/icon_512x512@2x.png" Resources/AppIcon-1024.png
 
 $(X86_64_EXECUTABLE): $(SOURCES) $(HEADERS) Makefile
 	@mkdir -p "$(ARCH_DIR)"

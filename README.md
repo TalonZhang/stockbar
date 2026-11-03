@@ -1,5 +1,7 @@
 # StockBar
 
+<img src="Resources/AppIcon-1024.png" width="96" alt="StockBar 应用图标">
+
 StockBar 是一个轻量的 macOS 菜单栏股票与场内基金行情应用。菜单栏只显示一个小图标，点击后即可查看上证指数、A 股和场内基金的名称、涨跌幅与现价。
 
 ![macOS](https://img.shields.io/badge/macOS-10.14%2B-black)
@@ -240,6 +242,14 @@ make release
 ```
 
 发布产物位于 `dist/`。
+
+重新导出应用图标：
+
+```bash
+make icon
+```
+
+图标源文件为 `Resources/AppIcon-artwork.png`，导出说明见 [Resources/AppIcon.md](Resources/AppIcon.md)。菜单栏图标独立使用系统符号，不会受应用图标更新影响。
 
 ## 技术说明
 
